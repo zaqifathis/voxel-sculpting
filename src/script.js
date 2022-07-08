@@ -10,7 +10,7 @@ let INTERSECTED;
 
 const canvas = document.querySelector("canvas.webgl");
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x222222);
+// scene.background = new THREE.Color(0x222222);
 
 //Sizes
 const sizes = {
@@ -25,7 +25,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-camera.position.set(28, 22, 28);
+camera.position.set(28, 25, 28);
 camera.lookAt(0, 0, 0);
 scene.add(camera);
 
@@ -72,6 +72,8 @@ const pointer = new THREE.Vector2();
  */
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
+  alpha: true,
+  antialias: true,
 });
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
