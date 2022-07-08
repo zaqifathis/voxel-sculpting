@@ -67,7 +67,7 @@ window.addEventListener("resize", () => {
 HELPER
  */
 // grid
-const gridHelper = new THREE.GridHelper(25, 25);
+const gridHelper = new THREE.GridHelper(30, 30);
 scene.add(gridHelper);
 
 // Axes
