@@ -41,7 +41,7 @@ controls.enableDamping = true;
 generateVoxels(5, 15, 5, voxelDim);
 
 // Lights
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
 scene.add(ambientLight);
 
 const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
@@ -68,7 +68,7 @@ window.addEventListener("resize", () => {
 HELPER
  */
 // grid
-const gridHelper = new THREE.GridHelper(50, 50);
+const gridHelper = new THREE.GridHelper(25, 25);
 scene.add(gridHelper);
 console.log(scene);
 
