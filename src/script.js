@@ -6,17 +6,35 @@ import * as dat from "dat.gui";
 // Debug
 // const gui = new dat.GUI();
 const voxelDim = 1;
-let raycaster;
 let INTERSECTED;
-
-const pointer = new THREE.Vector2();
 
 const canvas = document.querySelector("canvas.webgl");
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x222222);
 
+//Sizes
+const sizes = {
+  width: window.innerWidth,
+  height: window.innerHeight,
+};
+
+// Base camera
+const camera = new THREE.PerspectiveCamera(
+  45,
+  sizes.width / sizes.height,
+  0.1,
+  1000
+);
+camera.position.set(28, 22, 28);
+camera.lookAt(0, 0, 0);
+scene.add(camera);
+
+// Controls
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
+
 // getInitial voxels
-generateVoxels(5, 10, 5, voxelDim);
+generateVoxels(5, 15, 5, voxelDim);
 
 // Lights
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
@@ -26,14 +44,7 @@ const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
 dirLight.position.set(10, 20, 0);
 scene.add(dirLight);
 
-/**
- * Sizes
- */
-const sizes = {
-  width: window.innerWidth,
-  height: window.innerHeight,
-};
-
+window.addEventListener("pointermove", onPointerMove);
 window.addEventListener("resize", () => {
   // Update sizes
   sizes.width = window.innerWidth;
@@ -48,28 +59,13 @@ window.addEventListener("resize", () => {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
-/**
- * Camera
- */
-// Base camera
-const camera = new THREE.PerspectiveCamera(
-  45,
-  sizes.width / sizes.height,
-  0.1,
-  1000
-);
-camera.position.set(18, 18, 18);
-camera.lookAt(0, 0, 0);
-
-scene.add(camera);
-
-// Controls
-const controls = new OrbitControls(camera, canvas);
-controls.enableDamping = true;
-
 // Axes
 const axesHelper = new THREE.AxesHelper();
 scene.add(axesHelper);
+
+//raycaster
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
 
 /**
  * Renderer
@@ -87,9 +83,7 @@ const tick = () => {
   // Update Orbital Controls
   controls.update();
 
-  // Render
-  renderer.render(scene, camera);
-
+  render();
   // Call tick again on the next frame
   window.requestAnimationFrame(tick);
 };
@@ -122,4 +116,36 @@ function generateVoxel(xPos, zPos, yPos, voxelDim) {
   mesh.position.set(xPos, yPos, zPos);
   mesh.isSelected = false;
   scene.add(mesh);
+}
+
+function onPointerMove(event) {
+  // calculate pointer position in normalized device coordinates
+  // (-1 to +1) for both components
+  pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+  pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+}
+
+function render() {
+  camera.updateMatrixWorld();
+
+  // update the picking ray with the camera and pointer position
+  raycaster.setFromCamera(pointer, camera);
+
+  // find intersections
+  raycaster.setFromCamera(pointer, camera);
+
+  const intersects = raycaster.intersectObjects(scene.children, false);
+
+  if (intersects.length > 0) {
+    if (INTERSECTED != intersects[0].object) {
+      if (INTERSECTED)
+        INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+
+      INTERSECTED = intersects[0].object;
+      INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+      INTERSECTED.material.emissive.setHex(0xff0000);
+    }
+  }
+
+  renderer.render(scene, camera);
 }
