@@ -3,7 +3,6 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import * as dat from "dat.gui";
 
-// Debug
 // const gui = new dat.GUI();
 const voxelDim = 1;
 let INTERSECTED;
@@ -70,7 +69,6 @@ HELPER
 // grid
 const gridHelper = new THREE.GridHelper(25, 25);
 scene.add(gridHelper);
-console.log(scene);
 
 // Axes
 const axesHelper = new THREE.AxesHelper();
