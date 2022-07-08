@@ -7,6 +7,9 @@ import * as dat from "dat.gui";
 // const gui = new dat.GUI();
 const voxelDim = 1;
 let INTERSECTED;
+let material = new THREE.LineBasicMaterial({
+  color: 0xffffff,
+});
 
 const canvas = document.querySelector("canvas.webgl");
 let scene = new THREE.Scene();
@@ -61,6 +64,14 @@ window.addEventListener("resize", () => {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
+/* 
+HELPER
+ */
+// grid
+const gridHelper = new THREE.GridHelper(50, 50);
+scene.add(gridHelper);
+console.log(scene);
+
 // Axes
 const axesHelper = new THREE.AxesHelper();
 scene.add(axesHelper);
@@ -99,9 +110,9 @@ tick();
  */
 
 function generateVoxels(xLen, yLen, zLen, voxelDim) {
-  for (let i = 0; i < yLen; i += voxelDim) {
-    for (let j = 0; j < zLen; j += voxelDim) {
-      for (let k = 0; k < xLen; k += voxelDim) {
+  for (let i = voxelDim / 2; i < yLen; i += voxelDim) {
+    for (let j = voxelDim / 2; j < zLen; j += voxelDim) {
+      for (let k = voxelDim / 2; k < xLen; k += voxelDim) {
         generateVoxel(k, j, i, voxelDim);
       }
     }
@@ -144,18 +155,32 @@ function render() {
 
   // update the picking ray with the camera and pointer position
   // find intersections
-  raycaster.setFromCamera(pointer, camera);
+  raycaster.setFromCamera(pointer, camera), material;
 
   const intersects = raycaster.intersectObjects(scene.children, false);
 
   if (intersects.length > 0) {
-    if (INTERSECTED != intersects[0].object) {
+    if (
+      INTERSECTED != intersects[0].object &&
+      intersects[0].object.type !== "GridHelper"
+    ) {
       if (INTERSECTED) {
-        INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+        material = INTERSECTED.material;
+        if (material.emissive) {
+          material.emissive.setHex(INTERSECTED.currentHex);
+        } else {
+          material.color.setHex(INTERSECTED.currentHex);
+        }
       }
       INTERSECTED = intersects[0].object;
-      INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-      INTERSECTED.material.emissive.setHex(0xff0000);
+      material = INTERSECTED.material;
+      if (material.emissive) {
+        INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+        material.emissive.setHex(0xff0000);
+      } else {
+        INTERSECTED.currentHex = material.color.getHex();
+        material.color.setHex(0xff0000);
+      }
     }
   }
 
