@@ -9,7 +9,7 @@ const voxelDim = 1;
 let INTERSECTED;
 
 const canvas = document.querySelector("canvas.webgl");
-const scene = new THREE.Scene();
+let scene = new THREE.Scene();
 // scene.background = new THREE.Color(0x222222);
 
 //Sizes
@@ -20,12 +20,13 @@ const sizes = {
 
 // Base camera
 const camera = new THREE.PerspectiveCamera(
-  45,
+  50,
   sizes.width / sizes.height,
   0.1,
   1000
 );
-camera.position.set(28, 25, 28);
+
+camera.position.set(22, 22, 22);
 camera.lookAt(0, 0, 0);
 scene.add(camera);
 
@@ -45,6 +46,7 @@ dirLight.position.set(10, 20, 0);
 scene.add(dirLight);
 
 window.addEventListener("pointermove", onPointerMove);
+window.addEventListener("click", removeVoxel);
 window.addEventListener("resize", () => {
   // Update sizes
   sizes.width = window.innerWidth;
@@ -127,12 +129,20 @@ function onPointerMove(event) {
   pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
 }
 
+function removeVoxel(event) {
+  const selectedVoxel = INTERSECTED.uuid;
+  console.log("removeVoxel::", selectedVoxel);
+  scene.children.forEach((child, i) => {
+    if (child.uuid === selectedVoxel) {
+      scene.children.splice(i, 1);
+    }
+  });
+}
+
 function render() {
   camera.updateMatrixWorld();
 
   // update the picking ray with the camera and pointer position
-  raycaster.setFromCamera(pointer, camera);
-
   // find intersections
   raycaster.setFromCamera(pointer, camera);
 
@@ -140,9 +150,9 @@ function render() {
 
   if (intersects.length > 0) {
     if (INTERSECTED != intersects[0].object) {
-      if (INTERSECTED)
+      if (INTERSECTED) {
         INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-
+      }
       INTERSECTED = intersects[0].object;
       INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
       INTERSECTED.material.emissive.setHex(0xff0000);
