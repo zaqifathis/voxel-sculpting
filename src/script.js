@@ -4,11 +4,15 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import * as dat from 'lil-gui'
 
 
-
 //this is a branch of Voxel-Sculpting by Gilang
+
+/** 
+BASE SET-UP
+ */
 const gui = new dat.GUI();
 const voxelDim = 1;
 let INTERSECTED;
+let removedTowers;
 let material = new THREE.LineBasicMaterial({
   color: 0xffffff,
 });
@@ -35,23 +39,7 @@ camera.position.set(22, 22, 22);
 camera.lookAt(0, 0, 0);
 scene.add(camera);
 
-// Controls
-const controls = new OrbitControls(camera, canvas);
-controls.enableDamping = true;
-
-// getInitial voxels
-generateVoxels(5, 15, 5, voxelDim);
-
-// Lights
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-scene.add(ambientLight);
-
-const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
-dirLight.position.set(10, 20, 0);
-scene.add(dirLight);
-
-window.addEventListener("pointermove", onPointerMove);
-window.addEventListener("click", removeVoxel);
+//Resize
 window.addEventListener("resize", () => {
   // Update sizes
   sizes.width = window.innerWidth;
@@ -66,10 +54,32 @@ window.addEventListener("resize", () => {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
-/* 
+
+// Controls
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
+
+// getInitial voxels
+let tower = generateVoxels(5, 15, 5, voxelDim);
+console.log(tower)
+
+// Lights
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+scene.add(ambientLight);
+
+const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+dirLight.position.set(10, 20, 0);
+scene.add(dirLight);
+
+window.addEventListener("pointermove", onPointerMove);
+window.addEventListener("click", removeVoxel);
+window.addEventListener("auxclick", removeRandomVoxels);
+
+
+/** 
 HELPER
  */
-// grid
+// Grid
 const gridHelper = new THREE.GridHelper(30, 30);
 scene.add(gridHelper);
 
@@ -77,7 +87,7 @@ scene.add(gridHelper);
 const axesHelper = new THREE.AxesHelper();
 scene.add(axesHelper);
 
-//raycaster
+// Raycaster
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 
@@ -107,6 +117,7 @@ const tick = () => {
 tick();
 
 /* 
+FUNCTION
 -------------------------------------------------------------------
  */
 
@@ -134,6 +145,7 @@ function generateVoxel(xPos, zPos, yPos, voxelDim) {
   scene.add(mesh);
 }
 
+
 function onPointerMove(event) {
   // calculate pointer position in normalized device coordinates
   // (-1 to +1) for both components
@@ -149,6 +161,11 @@ function removeVoxel(event) {
       scene.children.splice(i, 1);
     }
   });
+}
+
+function removeRandomVoxels() {
+
+  console.log ("Remove Random Voxels");
 }
 
 function render() {
