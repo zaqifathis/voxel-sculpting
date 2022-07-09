@@ -1,12 +1,12 @@
 import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import * as dat from "dat.gui";
+import * as dat from 'lil-gui'
 
 
 
 //this is a branch of Voxel-Sculpting by Gilang
-// const gui = new dat.GUI();
+const gui = new dat.GUI();
 const voxelDim = 1;
 let INTERSECTED;
 let material = new THREE.LineBasicMaterial({
