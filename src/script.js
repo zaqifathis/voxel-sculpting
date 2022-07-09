@@ -1,34 +1,34 @@
 import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import * as dat from "dat.gui";
 
+//---------------------------------------------------------------------
+// Vairable declare
 const voxelDim = 1;
 const objects = [];
-
 let INTERSECTED;
-
 let material = new THREE.LineBasicMaterial({
   color: 0xffffff,
 });
 
+/* 
+Setup ---------------------------------------------------------------------
+ */
 const canvas = document.querySelector("canvas.webgl");
 let scene = new THREE.Scene();
 
-//Sizes
 const sizes = {
   width: window.innerWidth,
   height: window.innerHeight,
 };
 
-// Base camera
+// Camera
 const camera = new THREE.PerspectiveCamera(
   50,
   sizes.width / sizes.height,
   0.1,
   1000
 );
-
 camera.position.set(22, 22, 22);
 camera.lookAt(0, 0, 0);
 scene.add(camera);
@@ -37,9 +37,6 @@ scene.add(camera);
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
 
-// getInitial voxels
-generateVoxels(5, 15, 5, voxelDim);
-
 // Lights
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
 scene.add(ambientLight);
@@ -47,6 +44,9 @@ scene.add(ambientLight);
 const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
 dirLight.position.set(10, 20, 0);
 scene.add(dirLight);
+
+// Initial Voxel
+generateVoxels(5, 15, 5, voxelDim);
 
 //eventListener
 window.addEventListener("pointermove", onPointerMove);
@@ -66,10 +66,7 @@ window.addEventListener("resize", () => {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
-/* 
-HELPER
- */
-// grid
+// Grid Helper
 const gridHelper = new THREE.GridHelper(30, 30);
 scene.add(gridHelper);
 
@@ -90,73 +87,18 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-//Animate
+// Animate
 const tick = () => {
   controls.update();
 
   render();
   window.requestAnimationFrame(tick);
 };
-
 tick();
 
-/* 
--------------------------------------------------------------------
+/*
+---------------------------------------------------------------------
  */
-
-function generateVoxels(xLen, yLen, zLen, voxelDim) {
-  for (let i = voxelDim / 2; i < yLen; i += voxelDim) {
-    for (let j = voxelDim / 2; j < zLen; j += voxelDim) {
-      for (let k = voxelDim / 2; k < xLen; k += voxelDim) {
-        generateVoxel(k, j, i, voxelDim);
-      }
-    }
-  }
-}
-
-function generateVoxel(xPos, zPos, yPos, voxelDim) {
-  //ThreeJs
-  const geometry = new THREE.BoxGeometry(voxelDim, voxelDim, voxelDim);
-  const color = new THREE.Color(
-    `hsl(${200}, 100%, ${Math.floor(Math.random() * 50)}%)`
-  );
-  const material = new THREE.MeshLambertMaterial({ color });
-  const mesh = new THREE.Mesh(geometry, material);
-  mesh.position.set(xPos, yPos, zPos);
-  mesh.isSelected = false;
-  scene.add(mesh);
-}
-
-function onPointerMove(event) {
-  pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
-  pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
-}
-
-function onPointerDown(event) {
-  const selectedVoxel = INTERSECTED.uuid;
-  console.log("removeVoxel::", selectedVoxel);
-  scene.children.forEach((child, i) => {
-    if (child.uuid === selectedVoxel) {
-      scene.children.splice(i, 1);
-    }
-  });
-}
-
-function onDocumentKeyDown(event) {
-  switch (event.keyCode) {
-    case 16:
-      isShiftDown = true;
-      break;
-  }
-}
-
-function onDocumentKeyUp(event) {
-  switch (event.keyCode) {
-    case 16:
-      isShiftDown = false;
-      break;
-  }
-}
 
 function render() {
   camera.updateMatrixWorld();
@@ -189,4 +131,65 @@ function render() {
   }
 
   renderer.render(scene, camera);
+}
+
+/* 
+Generate Voxel -------------------------------------------------------------------
+ */
+
+function generateVoxels(xLen, yLen, zLen, voxelDim) {
+  for (let i = voxelDim / 2; i < yLen; i += voxelDim) {
+    for (let j = voxelDim / 2; j < zLen; j += voxelDim) {
+      for (let k = voxelDim / 2; k < xLen; k += voxelDim) {
+        generateVoxel(k, j, i, voxelDim);
+      }
+    }
+  }
+}
+
+function generateVoxel(xPos, zPos, yPos, voxelDim) {
+  //ThreeJs
+  const geometry = new THREE.BoxGeometry(voxelDim, voxelDim, voxelDim);
+  const color = new THREE.Color(
+    `hsl(${200}, 100%, ${Math.floor(Math.random() * 50)}%)`
+  );
+  const material = new THREE.MeshLambertMaterial({ color });
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(xPos, yPos, zPos);
+  mesh.isSelected = false;
+  scene.add(mesh);
+}
+
+// ---------------------------------------------------------------------
+// EventListener Funct
+
+function onPointerMove(event) {
+  pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+  pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+}
+
+function onPointerDown(event) {
+  const selectedVoxel = INTERSECTED.uuid;
+  console.log("removeVoxel::", selectedVoxel);
+  scene.children.forEach((child, i) => {
+    if (child.uuid === selectedVoxel) {
+      scene.children.splice(i, 1);
+    }
+  });
+}
+
+function onDocumentKeyDown(event) {
+  switch (event.keyCode) {
+    case 16:
+      isShiftDown = true;
+      break;
+  }
+}
+
+function onDocumentKeyUp(event) {
+  switch (event.keyCode) {
+    case 16:
+      isShiftDown = false;
+      break;
+  }
 }
