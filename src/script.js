@@ -45,26 +45,24 @@ const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
 dirLight.position.set(10, 20, 0);
 scene.add(dirLight);
 
+// ---------------------------------------------------------------------
 // Initial Voxel
 generateVoxels(5, 15, 5, voxelDim);
 
+//roll over- helper
+const rollOverGeo = new THREE.BoxGeometry(voxelDim, voxelDim, voxelDim);
+const rollOverMaterial = new THREE.MeshBasicMaterial({
+  color: 0xff0000,
+  opacity: 0.5,
+  transparent: true,
+});
+const rollOverMesh = new THREE.Mesh(rollOverGeo, rollOverMaterial);
+scene.add(rollOverMesh);
+
 //eventListener
+window.addEventListener("resize", onWindowResize);
 window.addEventListener("pointermove", onPointerMove);
 window.addEventListener("click", onPointerDown);
-
-window.addEventListener("resize", () => {
-  // Update sizes
-  sizes.width = window.innerWidth;
-  sizes.height = window.innerHeight;
-
-  // Update camera
-  camera.aspect = sizes.width / sizes.height;
-  camera.updateProjectionMatrix();
-
-  // Update renderer
-  renderer.setSize(sizes.width, sizes.height);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-});
 
 // Grid Helper
 const gridHelper = new THREE.GridHelper(30, 30);
@@ -90,6 +88,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 // Animate
 const tick = () => {
   controls.update();
+  camera.updateMatrixWorld();
 
   render();
   window.requestAnimationFrame(tick);
@@ -101,11 +100,20 @@ tick();
  */
 
 function render() {
+  //Raycast Update
   camera.updateMatrixWorld();
   raycaster.setFromCamera(pointer, camera), material;
   const intersects = raycaster.intersectObjects(scene.children, false);
 
   if (intersects.length > 0) {
+    const intersect = intersects[0];
+    rollOverMesh.position.copy(intersect.point).add(intersect.face.normal);
+    rollOverMesh.position
+      .divideScalar(voxelDim)
+      .floor()
+      .multiplyScalar(voxelDim)
+      .addScalar(voxelDim / 2);
+
     if (
       INTERSECTED != intersects[0].object &&
       intersects[0].object.type !== "GridHelper"
@@ -133,39 +141,14 @@ function render() {
   renderer.render(scene, camera);
 }
 
-/* 
-Generate Voxel -------------------------------------------------------------------
- */
-
-function generateVoxels(xLen, yLen, zLen, voxelDim) {
-  for (let i = voxelDim / 2; i < yLen; i += voxelDim) {
-    for (let j = voxelDim / 2; j < zLen; j += voxelDim) {
-      for (let k = voxelDim / 2; k < xLen; k += voxelDim) {
-        generateVoxel(k, j, i, voxelDim);
-      }
-    }
-  }
-}
-
-function generateVoxel(xPos, zPos, yPos, voxelDim) {
-  //ThreeJs
-  const geometry = new THREE.BoxGeometry(voxelDim, voxelDim, voxelDim);
-  const color = new THREE.Color(
-    `hsl(${200}, 100%, ${Math.floor(Math.random() * 50)}%)`
-  );
-  const material = new THREE.MeshLambertMaterial({ color });
-  const mesh = new THREE.Mesh(geometry, material);
-  mesh.position.set(xPos, yPos, zPos);
-  mesh.isSelected = false;
-  scene.add(mesh);
-}
-
 // ---------------------------------------------------------------------
 // EventListener Funct
 
 function onPointerMove(event) {
-  pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
-  pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  pointer.set(
+    (event.clientX / window.innerWidth) * 2 - 1,
+    -(event.clientY / window.innerHeight) * 2 + 1
+  );
 }
 
 function onPointerDown(event) {
@@ -192,4 +175,45 @@ function onDocumentKeyUp(event) {
       isShiftDown = false;
       break;
   }
+}
+
+function onWindowResize() {
+  // Update sizes
+  sizes.width = window.innerWidth;
+  sizes.height = window.innerHeight;
+
+  // Update camera
+  camera.aspect = sizes.width / sizes.height;
+  camera.updateProjectionMatrix();
+
+  // Update renderer
+  renderer.setSize(sizes.width, sizes.height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+}
+
+/* 
+Generate Voxel -------------------------------------------------------------------
+ */
+
+function generateVoxels(xLen, yLen, zLen, voxelDim) {
+  for (let i = voxelDim / 2; i < yLen; i += voxelDim) {
+    for (let j = voxelDim / 2; j < zLen; j += voxelDim) {
+      for (let k = voxelDim / 2; k < xLen; k += voxelDim) {
+        generateVoxel(k, j, i, voxelDim);
+      }
+    }
+  }
+}
+
+function generateVoxel(xPos, zPos, yPos, voxelDim) {
+  //ThreeJs
+  const geometry = new THREE.BoxGeometry(voxelDim, voxelDim, voxelDim);
+  const color = new THREE.Color(
+    `hsl(${200}, 100%, ${Math.floor(Math.random() * 50)}%)`
+  );
+  const material = new THREE.MeshLambertMaterial({ color });
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(xPos, yPos, zPos);
+  mesh.isSelected = false;
+  scene.add(mesh);
 }
