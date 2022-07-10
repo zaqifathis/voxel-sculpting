@@ -6,7 +6,7 @@
 
 #Run the Tower
 1. Npm Start on the Terminal
-2. Open a tab or multiple tab from localhost:8080 address
+2. Open a tab or multiple tabs from localhost:8080 address
 3. Please check the console from the browsers to check both connection is working
 4. Left Click to remove one Voxel and Right Click to remove 100 voxels randomly. Right CLick again to generate another interation.
 
