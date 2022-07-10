@@ -178,7 +178,7 @@ FUNCTION
     }
   }
 
-  function generateVoxels(xLen, yLen, zLen, voxelDim) {
+  function generateVoxels(xLen, yLen, zLen, voxelDim, doNotEmit) {
     //console.log('generateVoxels:::');
     const tower = {};
 
@@ -191,10 +191,13 @@ FUNCTION
       }
     }
 
-    console.log('generateVoxels:::', scene.children.length);
+    //console.log('generateVoxels:::', scene.children.length);
 
     playState.state = tower;
-    socket.emit('on-generate', playState);
+
+    if (!doNotEmit) {
+      socket.emit('on-generate', playState);
+    }
   }
 
   function generateFromState() {
@@ -258,15 +261,21 @@ FUNCTION
     }
   }
 
-  //function to remove random voxels using right-click
   function removeRandomVoxels() {
-    if (playState.randomGenerate === true) {
-      return;
-    }
-
     if (socket.id !== playState.host) {
       return;
     }
+
+    scene.children = scene.children.filter((obj) => {
+      if (obj.isVox) {
+        disposeMesh(scene, obj, true);
+        return false;
+      }
+
+      return true;
+    });
+
+    generateVoxels(5, 15, 5, voxelDim, true);
 
     const MAX_RANDOM_VOXELS = 100;
 
