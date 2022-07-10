@@ -258,6 +258,7 @@ FUNCTION
     }
   }
 
+  //function to remove random voxels using right-click
   function removeRandomVoxels() {
     if (playState.randomGenerate === true) {
       return;
