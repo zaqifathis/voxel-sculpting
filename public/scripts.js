@@ -1,12 +1,8 @@
 //import './style.css';
-import * as THREE from 'three';
-import { OrbitControls } from 'https://unpkg.com/three@0.142.0/examples/jsm/controls/OrbitControls.js';
-import { FBXLoader } from 'https://unpkg.com/three@0.142.0/examples/jsm/loaders/FBXLoader';
-import { io } from 'socket.io-client';
-
-//import * as dat from 'lil-gui';
-
-//this is a branch of Voxel-Sculpting by Gilang
+import * as THREE from "three";
+import { OrbitControls } from "https://unpkg.com/three@0.142.0/examples/jsm/controls/OrbitControls.js";
+import { FBXLoader } from "https://unpkg.com/three@0.142.0/examples/jsm/loaders/FBXLoader";
+import { io } from "socket.io-client";
 
 export const Game = () => {
   /** 
@@ -21,7 +17,7 @@ BASE SET-UP
   });
   let firstTimeRightClick = true;
 
-  const canvas = document.querySelector('canvas.webgl');
+  const canvas = document.querySelector("canvas.webgl");
   let scene = new THREE.Scene();
   // scene.background = new THREE.Color(0x222222);
 
@@ -44,7 +40,7 @@ BASE SET-UP
   scene.add(camera);
 
   //Resize
-  window.addEventListener('resize', () => {
+  window.addEventListener("resize", () => {
     // Update sizes
     sizes.width = window.innerWidth;
     sizes.height = window.innerHeight;
@@ -75,9 +71,9 @@ BASE SET-UP
   dirLight.position.set(10, 20, 0);
   scene.add(dirLight);
 
-  window.addEventListener('pointermove', onPointerMove);
-  window.addEventListener('click', removeVoxel);
-  window.addEventListener('auxclick', removeRandomVoxels);
+  window.addEventListener("pointermove", onPointerMove);
+  window.addEventListener("click", removeVoxel);
+  window.addEventListener("auxclick", removeRandomVoxels);
 
   /** 
 HELPER
@@ -119,7 +115,7 @@ HELPER
 
   const socket = io();
 
-  socket.on('user-connected', (payload) => {
+  socket.on("user-connected", (payload) => {
     playState = payload;
     //console.log('user connected::::', payload);
 
@@ -139,7 +135,7 @@ HELPER
     }
   });
 
-  socket.on('removed', (payload) => {
+  socket.on("removed", (payload) => {
     playState = payload;
 
     scene.children = scene.children.filter((obj) => {
@@ -196,7 +192,7 @@ FUNCTION
     playState.state = tower;
 
     if (!doNotEmit) {
-      socket.emit('on-generate', playState);
+      socket.emit("on-generate", playState);
     }
   }
 
@@ -206,7 +202,7 @@ FUNCTION
       generateVoxel(xPos, zPos, yPos, voxelDim, name, color);
     });
 
-    console.log('generateFromState:::', scene.children.length);
+    console.log("generateFromState:::", scene.children.length);
   }
 
   function generateVoxel(xPos, zPos, yPos, voxelDim, key, assignedColor) {
@@ -257,7 +253,7 @@ FUNCTION
     });
 
     if (playUpdated) {
-      socket.emit('on-remove', playState);
+      socket.emit("on-remove", playState);
     }
   }
 
@@ -311,7 +307,7 @@ FUNCTION
 
     playState.randomGenerate = true;
 
-    socket.emit('on-remove', playState);
+    socket.emit("on-remove", playState);
 
     // scene.children.forEach((child, i) => {
     //   if (voxelsToBeRemoved[child.uuid]) {
@@ -344,7 +340,7 @@ FUNCTION
     if (intersects.length > 0) {
       if (
         INTERSECTED != intersects[0].object &&
-        intersects[0].object.type !== 'GridHelper'
+        intersects[0].object.type !== "GridHelper"
       ) {
         if (INTERSECTED) {
           material = INTERSECTED.material;
