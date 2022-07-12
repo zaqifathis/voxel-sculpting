@@ -1,5 +1,13 @@
 Creative Coding Challenge DBF
 
+Hi, Welcome!
+
+We are team 5: 
+Zaqi Fathis
+Gilang Fajar
+
+Although we are still on progress, you can test our prototype.
+
 # voxel-sculpting
 
 #Before start
