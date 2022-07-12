@@ -1,11 +1,11 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-const http = require('http');
-const cors = require('cors');
+const http = require("http");
+const cors = require("cors");
 const server = http.createServer(app);
-const io = require('socket.io')(server);
+const io = require("socket.io")(server);
 
-app.use(express.static('public')); //go to public and load the html
+app.use(express.static("public")); //go to public and load the html
 // parse json request body
 app.use(express.json());
 // parse urlencoded request body
@@ -19,8 +19,8 @@ let playState = {
   randomGenerate: false,
 };
 
-io.on('connection', (socket) => {
-  console.log('new connection:' + socket.id);
+io.on("connection", (socket) => {
+  console.log("new connection:" + socket.id);
   //getting the data from the on-cut event
 
   //Assign host and the opponent
@@ -28,25 +28,25 @@ io.on('connection', (socket) => {
     playState.host = socket.id;
   }
 
-  socket.emit('user-connected', playState);
+  socket.emit("user-connected", playState);
 
-  socket.on('on-generate', (payload) => {
+  socket.on("on-generate", (payload) => {
     if (socket.id === playState.host) {
       playState = payload;
     }
 
-    socket.broadcast.emit('generated', playState);
+    socket.broadcast.emit("generated", playState);
   });
 
-  socket.on('on-remove', (payload) => {
+  socket.on("on-remove", (payload) => {
     //we need to receive the data from that event here
     //send the information/ata to the other player
     // socket.emit('sliced', payload)
     playState = payload;
-    socket.broadcast.emit('removed', payload);
+    socket.broadcast.emit("removed", payload);
   });
 
-  socket.on('disconnect', () => {
+  socket.on("disconnect", () => {
     // if (socket.id === playState.host) {
     //   playState = {
     //     host: null,
@@ -61,5 +61,5 @@ io.on('connection', (socket) => {
 
 //listening the html and show on the page
 server.listen(8080, () => {
-  console.log('listening on *:8080');
+  console.log("listening on *:8080");
 });
