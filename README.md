@@ -10,6 +10,8 @@ Although we are still on progress, you can test our prototype.
 https://github.com/zqfths/voxel-sculpting
 
 # voxel-sculpting
+![alt text](https://github.com/zqfths/voxel-sculpting/tree/main/img/voxel.png?raw=true)
+https://github.com/zqfths/voxel-sculpting/tree/main/img
 
 #Before start
 1. Open Terimal to Run
