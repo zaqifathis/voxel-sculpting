@@ -1,14 +1,3 @@
-Creative Coding Challenge DBF
-
-Hi, Welcome!
-
-We are team 5: 
-Zaqi Fathis
-Gilang Fajar
-
-Although we are still on progress, you can test our prototype.
-https://github.com/zqfths/voxel-sculpting
-
 # voxel-sculpting
 
 <img width="1714" alt="voxel1" src="https://user-images.githubusercontent.com/91657408/178402483-5c9f0c1a-505a-4368-9066-cfd50d8ae438.png">
